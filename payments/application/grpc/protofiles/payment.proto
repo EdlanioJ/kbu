@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package github.com.edlanioj.kbu.payments;
+
+option go_package = "application/grpc/protofiles;pb";
+
+message PaginationParams {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort = 3;
+}
+
+message Params {
+  string ID = 1;
+}
+
+
+message GetByParams {
+  string id = 1;
+  string transactionID = 2;
+}
+
+message CreateParams {
+  string fromID = 1;
+  string destinationID = 2;
+  float amount = 3;
+  string currency = 4;
+}
+
+message CreateServiceParams {
+  string fromID = 1;
+  string serviceID = 2;
+  string servicePriceID = 3;
+  float amount = 4;
+  string currency = 5;
+}
+
+message ListByParams {
+  string ID = 1;
+  PaginationParams pagination = 2;
+}
+
+message Transaction {
+  string ID = 1;
+  float amount = 2;
+  string status = 3;
+  string currency = 4;
+  string fromID = 5;
+  string toID = 6;
+  string serviceID = 7;
+  string storeID = 8;
+  string createdAt = 9;
+  string updatedAt = 10;
+}
+
+message ListResult {
+  repeated Transaction transactions = 1;
+  int32 total = 2;
+  string error = 3;
+}
+
+message PaymentResult {
+  Transaction transaction = 1;
+  string error = 2;
+}
+
+service PaymentService {
+  rpc List (PaginationParams) returns (ListResult) {};
+  rpc Get (Params) returns (PaymentResult) {};
+  rpc Complete (Params) returns (PaymentResult) {};
+  rpc Error (Params) returns (PaymentResult) {};
+  
+  rpc GetByAccountDestination (GetByParams) returns (PaymentResult) {};
+  rpc ListByAccountDestination (ListByParams) returns (ListResult) {};
+  rpc RegisterAccountPayment (CreateParams) returns (PaymentResult) {};
+
+  rpc GetByService (GetByParams) returns (PaymentResult) {};
+  rpc ListByService (ListByParams) returns (ListResult) {};
+  rpc RegisterServicePayment (CreateServiceParams) returns (PaymentResult) {};
+
+  rpc GetByStore (GetByParams) returns (PaymentResult) {};
+  rpc ListByStore (ListByParams) returns (ListResult) {};
+  rpc RegisterStorePayment (CreateParams) returns (PaymentResult) {};
+}
