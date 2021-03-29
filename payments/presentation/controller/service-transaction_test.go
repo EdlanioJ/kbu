@@ -43,7 +43,7 @@ func TestRegisterServiceTransaction(t *testing.T) {
 		accountFrom := "invalid id"
 		serviceTo := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 		servicePrice := "invalid id"
 
 		c := controller.NewServiceTransaction(nil)
@@ -150,7 +150,7 @@ func TestFindAllByServiceId(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		service, _ := entity.NewService("service", "service description", uuid.NewV4().String(), uuid.NewV4().String())
 
-		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 19, "AOA")
 		page := 1
 		limit := 10
 		sort := "created_at DESC"
@@ -230,7 +230,7 @@ func TestFindOneByService(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		service, _ := entity.NewService("service", "service description", uuid.NewV4().String(), uuid.NewV4().String())
 
-		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 19, "AOA")
 
 		transactionUseCase.On("FindOneByService", service.ID, transaction.ID).Return(transaction, nil)
 

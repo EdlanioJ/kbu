@@ -48,7 +48,7 @@ func (t *Transaction) isValid() error {
 
 func NewTransaction(accountFrom *Account, accountTo *Account, service *Service, store *Store, amount float64, currency string) (*Transaction, error) {
 	if currency == "" {
-		currency = "AKZ"
+		currency = "AOA"
 	}
 
 	transaction := Transaction{

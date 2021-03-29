@@ -17,7 +17,7 @@ func NewTransactionTestMock() (*repository.TransactionRepositoryGORM, sqlmock.Sq
 	accountFrom, _ := entity.NewAccount(3000)
 	accountTo, _ := entity.NewAccount(200)
 
-	transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 200, "AKZ")
+	transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 200, "AOA")
 
 	db, mock, err := sqlmock.New()
 
@@ -148,7 +148,7 @@ func TestTransactionRepository(t *testing.T) {
 
 		service, _ := entity.NewService("service", "service description", uuid.NewV4().String(), uuid.NewV4().String())
 		accountFrom, _ := entity.NewAccount(3900)
-		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 100, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 100, "AOA")
 
 		row := sqlmock.NewRows([]string{"id", "account_from_id", "amount", "status", "currency", "account_to_id", "created_at", "updated_at"}).
 			AddRow(transaction.ID, transaction.AccountFromID, transaction.Amount, transaction.Status, transaction.Currency, transaction.AccountToID, transaction.CreatedAt, transaction.UpdatedAt)
@@ -178,7 +178,7 @@ func TestTransactionRepository(t *testing.T) {
 
 		store, _ := entity.NewStore("store", "store description", uuid.NewV4().String(), uuid.NewV4().String())
 		accountFrom, _ := entity.NewAccount(3900)
-		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 100, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 100, "AOA")
 
 		row := sqlmock.NewRows([]string{"id", "account_from_id", "amount", "status", "currency", "store_id", "created_at", "updated_at"}).
 			AddRow(transaction.ID, transaction.AccountFromID, transaction.Amount, transaction.Status, transaction.Currency, transaction.StoreID, transaction.CreatedAt, transaction.UpdatedAt)
@@ -340,7 +340,7 @@ func TestTransactionRepository(t *testing.T) {
 
 		service, _ := entity.NewService("service", "service description", uuid.NewV4().String(), uuid.NewV4().String())
 		accountFrom, _ := entity.NewAccount(3900)
-		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 100, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 100, "AOA")
 
 		page := 1
 		limit := 10
@@ -388,7 +388,7 @@ func TestTransactionRepository(t *testing.T) {
 
 		store, _ := entity.NewStore("store", "store description", uuid.NewV4().String(), uuid.NewV4().String())
 		accountFrom, _ := entity.NewAccount(3900)
-		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 100, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 100, "AOA")
 
 		page := 1
 		limit := 10

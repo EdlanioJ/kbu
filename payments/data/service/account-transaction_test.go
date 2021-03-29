@@ -19,7 +19,7 @@ func Test_RegisterAccountTransaction_Success(t *testing.T) {
 	accountFrom, _ := entity.NewAccount(3000.93)
 	accountTo, _ := entity.NewAccount(200)
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 
 	mockAccountRepo.On("Find", accountFrom.ID).Return(accountFrom, nil)
 	mockAccountRepo.On("Find", accountTo.ID).Return(accountTo, nil)
@@ -43,7 +43,7 @@ func Test_RegisterAccountTransaction_Failure_On_FindAccountFrom(t *testing.T) {
 
 	id := uuid.NewV4().String()
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 	mockAccountRepo.On("Find", id).Return(&entity.Account{}, errors.New("Account from not found"))
 
 	accountTransaction := service.NewAccountTransaction(nil, mockAccountRepo)
@@ -63,7 +63,7 @@ func Test_RegisterAccountTransaction_Failure_On_FindAccountTo(t *testing.T) {
 	accountFrom, _ := entity.NewAccount(3000.93)
 	id := uuid.NewV4().String()
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 
 	mockAccountRepo.On("Find", accountFrom.ID).Return(accountFrom, nil)
 	mockAccountRepo.On("Find", id).Return(&entity.Account{}, errors.New("Account To not found"))
@@ -85,7 +85,7 @@ func Test_RegisterAccountTransaction_Failure_On_WithdrowAccount(t *testing.T) {
 	accountFrom, _ := entity.NewAccount(3.00)
 	accountTo, _ := entity.NewAccount(200)
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 
 	mockAccountRepo.On("Find", accountFrom.ID).Return(accountFrom, nil)
 	mockAccountRepo.On("Find", accountTo.ID).Return(accountTo, nil)
@@ -107,7 +107,7 @@ func Test_RegisterAccountTransaction_Failure_On_NewTransaction(t *testing.T) {
 	accountFrom, _ := entity.NewAccount(3000.93)
 	accountTo, _ := entity.NewAccount(200)
 	amount := 0.00
-	currency := "AKZ"
+	currency := "AOA"
 
 	mockAccountRepo.On("Find", accountFrom.ID).Return(accountFrom, nil)
 	mockAccountRepo.On("Find", accountTo.ID).Return(accountTo, nil)
@@ -131,7 +131,7 @@ func Test_RegisterAccountTransaction_Failure_On_RegisterTransaction(t *testing.T
 	accountFrom, _ := entity.NewAccount(3000.93)
 	accountTo, _ := entity.NewAccount(200)
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 
 	mockAccountRepo.On("Find", accountFrom.ID).Return(accountFrom, nil)
 	mockAccountRepo.On("Find", accountTo.ID).Return(accountTo, nil)
@@ -156,7 +156,7 @@ func Test_RegisterAccountTransaction_Failure_On_SaveAccountFrom(t *testing.T) {
 	accountFrom, _ := entity.NewAccount(3000.93)
 	accountTo, _ := entity.NewAccount(200)
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 
 	mockAccountRepo.On("Find", accountFrom.ID).Return(accountFrom, nil)
 	mockAccountRepo.On("Find", accountTo.ID).Return(accountTo, nil)
@@ -183,7 +183,7 @@ func Test_FindAllByAccountTo_Success(t *testing.T) {
 	accountFrom, _ := entity.NewAccount(3000.93)
 	accountTo, _ := entity.NewAccount(200)
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 	transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, amount, currency)
 	page := 1
 	limit := 10
@@ -269,7 +269,7 @@ func Test_FindOneByAccount_Success(t *testing.T) {
 	accountFrom, _ := entity.NewAccount(3000.93)
 	accountTo, _ := entity.NewAccount(200)
 	amount := 200.00
-	currency := "AKZ"
+	currency := "AOA"
 	transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, amount, currency)
 
 	mockAccountRepo.On("Find", accountTo.ID).Return(accountTo, nil)

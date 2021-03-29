@@ -17,7 +17,7 @@ func Test_RegisterServiceTransaction_Fail_On_MissingParams(t *testing.T) {
 
 	accountFromId := uuid.NewV4().String()
 	serviceId := uuid.NewV4().String()
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, "", 0, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, "", 0, "AOA")
 
 	assert.Nil(t, result)
 	assert.NotNil(t, err)
@@ -34,7 +34,7 @@ func Test_RegisterServiceTransaction_Fail_On_FindAccount(t *testing.T) {
 	mockAccountRepository.On("Find", accountFromId).Return(&entity.Account{}, errors.New("account not found"))
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, nil, nil, nil)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, "", amount, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, "", amount, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 
@@ -55,7 +55,7 @@ func Test_RegisterServiceTransaction_Fail_On_FindService(t *testing.T) {
 	mockServiceRepository.On("FindServiceByIdAndStatus", serviceId, entity.ServiceActive).Return(&entity.Service{}, errors.New("service not found"))
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, nil, mockServiceRepository, nil)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, "", amount, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, "", amount, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 	mockServiceRepository.AssertExpectations(t)
@@ -80,7 +80,7 @@ func Test_RegisterServiceTransaction_Fail_On_FindServicePrice(t *testing.T) {
 
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, mockServicePriceRepository, mockServiceRepository, nil)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, servicePriceId, 0, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFromId, serviceId, servicePriceId, 0, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 	mockServiceRepository.AssertExpectations(t)
@@ -104,7 +104,7 @@ func Test_RegisterServiceTransaction_Fail_On_WithdrowAccount(t *testing.T) {
 
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, nil, mockServiceRepository, nil)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceId, "", amount, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceId, "", amount, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 	mockServiceRepository.AssertExpectations(t)
@@ -129,7 +129,7 @@ func Test_RegisterServiceTransaction_Fail_On_NewTransaction(t *testing.T) {
 
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, mockServicePriceRepository, mockServiceRepository, nil)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, servicePriceId, 0, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, servicePriceId, 0, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 	mockServiceRepository.AssertExpectations(t)
@@ -156,7 +156,7 @@ func Test_RegisterServiceTransaction_Fail_On_RegisterTransaction(t *testing.T) {
 
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, nil, mockServiceRepository, mockTransactionRepository)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, "", amount, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, "", amount, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 	mockServiceRepository.AssertExpectations(t)
@@ -184,7 +184,7 @@ func Test_RegisterServiceTransaction_Fail_On_SaveAccount(t *testing.T) {
 
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, nil, mockServiceRepository, mockTransactionRepository)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, "", amount, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, "", amount, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 	mockServiceRepository.AssertExpectations(t)
@@ -211,7 +211,7 @@ func Test_RegisterServiceTransaction_Success(t *testing.T) {
 
 	serviceTransaction := service.NewServiceTransaction(mockAccountRepository, nil, mockServiceRepository, mockTransactionRepository)
 
-	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, "", amount, "AKZ")
+	result, err := serviceTransaction.RegisterServiceTransaction(accountFrom.ID, serviceEntity.ID, "", amount, "AOA")
 
 	mockAccountRepository.AssertExpectations(t)
 	mockServiceRepository.AssertExpectations(t)
@@ -279,7 +279,7 @@ func Test_FindAllByServiceId_Success(t *testing.T) {
 	mockTransactionRepository := new(repoMock.MockTransactionRepository)
 	account, _ := entity.NewAccount(200)
 	serviceEntity, _ := entity.NewService("service 1", "service 1 descriptions", uuid.NewV4().String(), uuid.NewV4().String())
-	transaction, _ := entity.NewTransaction(account, nil, serviceEntity, nil, 10, "AKZ")
+	transaction, _ := entity.NewTransaction(account, nil, serviceEntity, nil, 10, "AOA")
 	page := 1
 	limit := 10
 	sort := "created_at DESC"
@@ -351,7 +351,7 @@ func Test_FindOneByService_Success(t *testing.T) {
 	mockTransactionRepository := new(repoMock.MockTransactionRepository)
 	account, _ := entity.NewAccount(200)
 	serviceEntity, _ := entity.NewService("service 1", "service 1 descriptions", uuid.NewV4().String(), uuid.NewV4().String())
-	transaction, _ := entity.NewTransaction(account, nil, serviceEntity, nil, 10, "AKZ")
+	transaction, _ := entity.NewTransaction(account, nil, serviceEntity, nil, 10, "AOA")
 
 	mockServiceRepository.On("Find", serviceEntity.ID).Return(serviceEntity, nil)
 	mockTransactionRepository.On("FindOneByService", transaction.ID, serviceEntity.ID).Return(transaction, nil)

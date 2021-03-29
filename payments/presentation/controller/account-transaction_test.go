@@ -147,7 +147,7 @@ func TestFindAllByAccountTo(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		accountTo, _ := entity.NewAccount(10)
 
-		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AOA")
 
 		page := 1
 		limit := 10
@@ -225,7 +225,7 @@ func TestFindOneByAccount(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		accountTo, _ := entity.NewAccount(10)
 
-		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AOA")
 
 		transactionUseCase.On("FindOneByAccount", transaction.AccountFromID, transaction.ID).Return(transaction, nil)
 

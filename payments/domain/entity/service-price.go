@@ -32,7 +32,7 @@ func (s *ServicePrice) isValid() error {
 
 func NewServicePrice(service *Service, description string, amount float64, currency string) (*ServicePrice, error) {
 	if currency == "" {
-		currency = "AKZ"
+		currency = "AOA"
 	}
 	servicePrice := ServicePrice{
 		Service:     service,

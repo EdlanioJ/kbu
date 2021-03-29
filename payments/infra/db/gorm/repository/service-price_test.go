@@ -14,7 +14,7 @@ import (
 
 func NewServicePriceTestMock() (*repository.ServicePriceRepositoryGORM, sqlmock.Sqlmock, *entity.ServicePrice) {
 	service, _ := entity.NewService("service", "service description", uuid.NewV4().String(), uuid.NewV4().String())
-	servicePrice, _ := entity.NewServicePrice(service, "service price description", 10, "AKZ")
+	servicePrice, _ := entity.NewServicePrice(service, "service price description", 10, "AOA")
 
 	db, mock, err := sqlmock.New()
 

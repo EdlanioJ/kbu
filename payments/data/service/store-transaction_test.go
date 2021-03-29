@@ -21,7 +21,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		accountFromId := uuid.NewV4().String()
 		storeId := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		mockAccountRepository.On("Find", accountFromId).Return(&entity.Account{}, errors.New("account not found"))
 		storeTransaction := service.NewStoreTransaction(mockAccountRepository, nil, nil)
@@ -42,7 +42,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		accountFromId := uuid.NewV4().String()
 		storeId := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		mockAccountRepository.On("Find", accountFromId).Return(&entity.Account{}, nil)
 		mockStoreRepository.On("FindStoreByIdAndStatus", storeId, entity.StoreActive).Return(&entity.Store{}, errors.New("store not found"))
@@ -68,7 +68,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 
 		storeId := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		mockAccountRepository.On("Find", accountFrom.ID).Return(accountFrom, nil)
 		mockStoreRepository.On("FindStoreByIdAndStatus", storeId, entity.StoreActive).Return(&entity.Store{}, nil)
@@ -93,7 +93,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		store, _ := entity.NewStore("store 1", "store description 1", uuid.NewV4().String(), uuid.NewV4().String())
 
 		amount := 0.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		mockAccountRepository.On("Find", accountFrom.ID).Return(accountFrom, nil)
 		mockStoreRepository.On("FindStoreByIdAndStatus", store.ID, entity.StoreActive).Return(store, nil)
@@ -119,7 +119,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		store, _ := entity.NewStore("store 1", "store description 1", uuid.NewV4().String(), uuid.NewV4().String())
 
 		amount := 40.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		mockAccountRepository.On("Find", accountFrom.ID).Return(accountFrom, nil)
 		mockStoreRepository.On("FindStoreByIdAndStatus", store.ID, entity.StoreActive).Return(store, nil)
@@ -147,7 +147,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		store, _ := entity.NewStore("store 1", "store description 1", uuid.NewV4().String(), uuid.NewV4().String())
 
 		amount := 40.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		mockAccountRepository.On("Find", accountFrom.ID).Return(accountFrom, nil)
 		mockStoreRepository.On("FindStoreByIdAndStatus", store.ID, entity.StoreActive).Return(store, nil)
@@ -178,7 +178,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		store, _ := entity.NewStore("store 1", "store description 1", uuid.NewV4().String(), uuid.NewV4().String())
 
 		amount := 40.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		mockAccountRepository.On("Find", accountFrom.ID).Return(accountFrom, nil)
 		mockStoreRepository.On("FindStoreByIdAndStatus", store.ID, entity.StoreActive).Return(store, nil)
@@ -269,7 +269,7 @@ func TestFindAllByStoreId(t *testing.T) {
 		store, _ := entity.NewStore("store 1", "store description 1", uuid.NewV4().String(), uuid.NewV4().String())
 
 		amount := 40.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, amount, currency)
 		page := 1
@@ -356,7 +356,7 @@ func TestFindOneByStore(t *testing.T) {
 		store, _ := entity.NewStore("store 1", "store description 1", uuid.NewV4().String(), uuid.NewV4().String())
 
 		amount := 40.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, amount, currency)
 

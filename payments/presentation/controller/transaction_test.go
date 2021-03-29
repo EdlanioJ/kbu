@@ -70,7 +70,7 @@ func TestFind(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		accountTo, _ := entity.NewAccount(10)
 
-		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AOA")
 
 		transactionUseCase.On("Find", transaction.ID).Return(transaction, nil)
 
@@ -152,7 +152,7 @@ func TestFindAll(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		accountTo, _ := entity.NewAccount(10)
 
-		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AOA")
 
 		transactionUseCase.On("FindAll", page, limit, sort).Return([]*entity.Transaction{transaction}, 1, nil)
 
@@ -209,7 +209,7 @@ func TestComplete(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		accountTo, _ := entity.NewAccount(10)
 
-		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AOA")
 
 		transaction.Status = entity.TransactionCompleted
 
@@ -265,7 +265,7 @@ func TestError(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		accountTo, _ := entity.NewAccount(10)
 
-		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AOA")
 
 		transaction.Status = entity.TransactionError
 

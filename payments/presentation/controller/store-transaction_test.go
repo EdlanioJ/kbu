@@ -21,7 +21,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		accountFrom := uuid.NewV4().String()
 		storeId := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		c := controller.NewStoreTransaction(nil)
 
@@ -147,7 +147,7 @@ func TestFindAllByStoreId(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		store, _ := entity.NewStore("store", "store description", uuid.NewV4().String(), uuid.NewV4().String())
 
-		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 19, "AOA")
 
 		page := 1
 		limit := 10
@@ -227,7 +227,7 @@ func TestFindOneByStore(t *testing.T) {
 
 		accountFrom, _ := entity.NewAccount(200)
 		store, _ := entity.NewStore("store", "store description", uuid.NewV4().String(), uuid.NewV4().String())
-		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 19, "AOA")
 
 		transactionUseCase.On("FindOneByStore", store.ID, transaction.ID).Return(transaction, nil)
 
