@@ -7,6 +7,7 @@ import (
 	"github.com/EdlanioJ/kbu/payments/domain/entity"
 	"github.com/EdlanioJ/kbu/payments/domain/usecase"
 	"github.com/EdlanioJ/kbu/payments/presentation/utils/log"
+	"github.com/EdlanioJ/kbu/payments/presentation/validator"
 )
 
 var (
@@ -27,6 +28,14 @@ func NewServiceTransaction(Transaction usecase.ServiceTransaction) *ServiceTrans
 }
 
 func (c *ServiceTransaction) RegisterServiceTransaction(ctx context.Context, fromId string, serviceId string, servicePriceId string, amount float64, currency string) (*entity.Transaction, error) {
+	err := validator.ValidateRegisterServiceTransactionParams(fromId, serviceId, servicePriceId, amount, currency)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, err
+	}
+
 	transaction, err := c.Transaction.RegisterServiceTransaction(fromId, serviceId, servicePriceId, amount, currency)
 
 	if err != nil {
@@ -38,6 +47,13 @@ func (c *ServiceTransaction) RegisterServiceTransaction(ctx context.Context, fro
 }
 
 func (c *ServiceTransaction) FindAllByServiceId(ctx context.Context, serviceId string, page int, limit int, sort string) ([]*entity.Transaction, int, error) {
+	err := validator.ValidateFindAllByServiceIdParams(serviceId, page, limit, sort)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, 0, err
+	}
 	transactions, total, err := c.Transaction.FindAllByServiceId(serviceId, page, limit, sort)
 	if err != nil {
 		log.Error(ctx, err, errOnFindAllTransactionByService.Error())
@@ -51,6 +67,14 @@ func (c *ServiceTransaction) FindAllByServiceId(ctx context.Context, serviceId s
 }
 
 func (c *ServiceTransaction) FindOneByService(ctx context.Context, serviceId string, transactionId string) (*entity.Transaction, error) {
+	err := validator.ValidateFindOneByServiceParams(serviceId, transactionId)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, err
+	}
+
 	transaction, err := c.Transaction.FindOneByService(serviceId, transactionId)
 
 	if err != nil {

@@ -22,7 +22,7 @@ func TestRegisterAccountTransaction(t *testing.T) {
 		accountFrom := uuid.NewV4().String()
 		accountTo := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		transactionUseCase.On("RegisterAccountTransaction", accountFrom, accountTo, amount, currency).Return(nil, errors.New("internal error"))
 
@@ -36,6 +36,23 @@ func TestRegisterAccountTransaction(t *testing.T) {
 		is.EqualError(err, "error on register account payment")
 	})
 
+	t.Run("should fail on validate params register account transaction", func(t *testing.T) {
+		is := require.New(t)
+
+		accountFrom := uuid.NewV4().String()
+		accountTo := "invalid id"
+		amount := 30.00
+		currency := "AOA"
+
+		c := controller.NewAccountTransaction(nil)
+
+		result, err := c.RegisterAccountTransaction(context.TODO(), accountFrom, accountTo, amount, currency)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
+
 	t.Run("should succeed on register account transaction", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockAccountTransactionUseCase()
@@ -43,7 +60,7 @@ func TestRegisterAccountTransaction(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		accountTo, _ := entity.NewAccount(10)
 
-		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, accountTo, nil, nil, 19, "AOA")
 
 		transactionUseCase.On("RegisterAccountTransaction", accountFrom.ID, accountTo.ID, transaction.Amount, transaction.Currency).Return(transaction, nil)
 
@@ -60,6 +77,24 @@ func TestRegisterAccountTransaction(t *testing.T) {
 
 func TestFindAllByAccountTo(t *testing.T) {
 	t.Parallel()
+
+	t.Run("should fail on validate list transaction by account destination", func(t *testing.T) {
+		is := require.New(t)
+
+		accountTo := "invalid id"
+		page := -4
+		limit := 10
+		sort := "created_at DESC"
+
+		c := controller.NewAccountTransaction(nil)
+
+		result, total, err := c.FindAllByAccountTo(context.TODO(), accountTo, page, limit, sort)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+		is.Equal(0, total)
+	})
 
 	t.Run("should fail on list transaction by account destination", func(t *testing.T) {
 		is := require.New(t)
@@ -134,6 +169,22 @@ func TestFindAllByAccountTo(t *testing.T) {
 
 func TestFindOneByAccount(t *testing.T) {
 	t.Parallel()
+
+	t.Run("should fail on get transaction by account from", func(t *testing.T) {
+		is := require.New(t)
+
+		transactionId := "invalid id"
+		accountId := uuid.NewV1().String()
+
+		c := controller.NewAccountTransaction(nil)
+
+		result, err := c.FindOneByAccount(context.TODO(), accountId, transactionId)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
+
 	t.Run("should fail on get transaction by account from", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockAccountTransactionUseCase()

@@ -22,7 +22,7 @@ func TestRegisterServiceTransaction(t *testing.T) {
 		accountFrom := uuid.NewV4().String()
 		serviceTo := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 		servicePrice := uuid.NewV4().String()
 
 		transactionUseCase.On("RegisterServiceTransaction", accountFrom, serviceTo, servicePrice, amount, currency).Return(nil, errors.New("internal error"))
@@ -37,6 +37,24 @@ func TestRegisterServiceTransaction(t *testing.T) {
 		is.EqualError(err, "error on register service payment")
 	})
 
+	t.Run("should fail on validate params register service transaction", func(t *testing.T) {
+		is := require.New(t)
+
+		accountFrom := "invalid id"
+		serviceTo := uuid.NewV4().String()
+		amount := 30.00
+		currency := "AKZ"
+		servicePrice := "invalid id"
+
+		c := controller.NewServiceTransaction(nil)
+
+		result, err := c.RegisterServiceTransaction(context.TODO(), accountFrom, serviceTo, servicePrice, amount, currency)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
+
 	t.Run("should succeed on register service transaction", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockServiceTransactionUseCase()
@@ -44,7 +62,7 @@ func TestRegisterServiceTransaction(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		service, _ := entity.NewService("service", "service description", uuid.NewV4().String(), uuid.NewV4().String())
 
-		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, service, nil, 19, "AOA")
 
 		servicePrice := uuid.NewV4().String()
 		transactionUseCase.On("RegisterServiceTransaction", accountFrom.ID, service.ID, servicePrice, transaction.Amount, transaction.Currency).Return(transaction, nil)
@@ -62,6 +80,24 @@ func TestRegisterServiceTransaction(t *testing.T) {
 
 func TestFindAllByServiceId(t *testing.T) {
 	t.Parallel()
+
+	t.Run("should fail on validate list transaction by service destination", func(t *testing.T) {
+		is := require.New(t)
+
+		serviceId := uuid.NewV1().String()
+		page := 1
+		limit := 10
+		sort := "created_at DESC"
+
+		c := controller.NewServiceTransaction(nil)
+
+		result, total, err := c.FindAllByServiceId(context.TODO(), serviceId, page, limit, sort)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+		is.Equal(0, total)
+	})
 
 	t.Run("should fail on list transaction by service destination", func(t *testing.T) {
 		is := require.New(t)
@@ -137,6 +173,21 @@ func TestFindAllByServiceId(t *testing.T) {
 
 func TestFindOneByService(t *testing.T) {
 	t.Parallel()
+
+	t.Run("should fail on validate get transaction by service", func(t *testing.T) {
+		is := require.New(t)
+
+		transactionId := uuid.NewV1().String()
+		serviceId := uuid.NewV1().String()
+
+		c := controller.NewServiceTransaction(nil)
+
+		result, err := c.FindOneByService(context.TODO(), serviceId, transactionId)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
 
 	t.Run("should fail on get transaction by service", func(t *testing.T) {
 		is := require.New(t)

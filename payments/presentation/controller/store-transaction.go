@@ -7,6 +7,7 @@ import (
 	"github.com/EdlanioJ/kbu/payments/domain/entity"
 	"github.com/EdlanioJ/kbu/payments/domain/usecase"
 	"github.com/EdlanioJ/kbu/payments/presentation/utils/log"
+	"github.com/EdlanioJ/kbu/payments/presentation/validator"
 )
 
 var (
@@ -27,6 +28,14 @@ func NewStoreTransaction(Transaction usecase.StoreTransaction) *StoreTransaction
 }
 
 func (c *StoreTransaction) RegisterStoreTransaction(ctx context.Context, fromId string, storeId string, amount float64, currency string) (*entity.Transaction, error) {
+	err := validator.ValidateRegisterStoreTransactionParams(fromId, storeId, amount, currency)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, err
+	}
+
 	transaction, err := c.Transaction.RegisterStoreTransaction(fromId, storeId, amount, currency)
 
 	if err != nil {
@@ -38,6 +47,14 @@ func (c *StoreTransaction) RegisterStoreTransaction(ctx context.Context, fromId 
 }
 
 func (c *StoreTransaction) FindAllByStoreId(ctx context.Context, storeId string, page int, limit int, sort string) ([]*entity.Transaction, int, error) {
+	err := validator.ValidateFindAllByStoreIdParams(storeId, page, limit, sort)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, 0, err
+	}
+
 	transactions, total, err := c.Transaction.FindAllByStoreId(storeId, page, limit, sort)
 
 	if err != nil {
@@ -53,6 +70,14 @@ func (c *StoreTransaction) FindAllByStoreId(ctx context.Context, storeId string,
 	return transactions, total, nil
 }
 func (c *StoreTransaction) FindOneByStore(ctx context.Context, storeId string, transactionId string) (*entity.Transaction, error) {
+	err := validator.ValidateFindOneByStoreParams(storeId, transactionId)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, err
+	}
+
 	transaction, err := c.Transaction.FindOneByStore(storeId, transactionId)
 
 	if err != nil {

@@ -5,6 +5,8 @@ go 1.15
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
+	github.com/confluentinc/confluent-kafka-go v1.6.1
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.1.1

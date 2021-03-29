@@ -15,6 +15,20 @@ import (
 func TestFind(t *testing.T) {
 	t.Parallel()
 
+	t.Run("should fail on validate", func(t *testing.T) {
+		is := require.New(t)
+
+		id := uuid.NewV1().String()
+
+		c := controller.NewTransaction(nil)
+
+		result, err := c.Find(context.TODO(), id)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
+
 	t.Run("should fail on find usecase transaction", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockTransactionUseCase()
@@ -71,6 +85,23 @@ func TestFind(t *testing.T) {
 
 func TestFindAll(t *testing.T) {
 	t.Parallel()
+
+	t.Run("should fail on find all on validate", func(t *testing.T) {
+		is := require.New(t)
+
+		page := -11
+		limit := 10
+		sort := "created_at DESC"
+
+		c := controller.NewTransaction(nil)
+
+		result, total, err := c.FindAll(context.TODO(), page, limit, sort)
+
+		is.Nil(result)
+		is.Equal(0, total)
+		is.NotNil(err)
+		is.Error(err)
+	})
 
 	t.Run("should fail on find all usecase transactions", func(t *testing.T) {
 		is := require.New(t)
@@ -140,6 +171,20 @@ func TestFindAll(t *testing.T) {
 func TestComplete(t *testing.T) {
 	t.Parallel()
 
+	t.Run("should fail on validate", func(t *testing.T) {
+		is := require.New(t)
+
+		id := uuid.NewV1().String()
+
+		c := controller.NewTransaction(nil)
+
+		result, err := c.Complete(context.TODO(), id)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
+
 	t.Run("should fail on complete usecase", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockTransactionUseCase()
@@ -182,7 +227,21 @@ func TestComplete(t *testing.T) {
 func TestError(t *testing.T) {
 	t.Parallel()
 
-	t.Run("should fail on complete usecase", func(t *testing.T) {
+	t.Run("should fail on validate", func(t *testing.T) {
+		is := require.New(t)
+
+		id := uuid.NewV1().String()
+
+		c := controller.NewTransaction(nil)
+
+		result, err := c.Error(context.TODO(), id)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
+
+	t.Run("should fail on cancel", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockTransactionUseCase()
 
@@ -199,7 +258,7 @@ func TestError(t *testing.T) {
 		is.EqualError(err, "error on cancel payment")
 	})
 
-	t.Run("should succeed on complete usecase", func(t *testing.T) {
+	t.Run("should succeed on cancel", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockTransactionUseCase()
 

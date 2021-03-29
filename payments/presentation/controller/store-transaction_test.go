@@ -15,6 +15,23 @@ import (
 func TestRegisterStoreTransaction(t *testing.T) {
 	t.Parallel()
 
+	t.Run("should fail on validate register store transaction", func(t *testing.T) {
+		is := require.New(t)
+
+		accountFrom := uuid.NewV4().String()
+		storeId := uuid.NewV4().String()
+		amount := 30.00
+		currency := "AKZ"
+
+		c := controller.NewStoreTransaction(nil)
+
+		result, err := c.RegisterStoreTransaction(context.TODO(), accountFrom, storeId, amount, currency)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
+
 	t.Run("should fail on register store transaction", func(t *testing.T) {
 		is := require.New(t)
 		transactionUseCase := mock.NewMockStoreTransactionUseCase()
@@ -22,7 +39,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		accountFrom := uuid.NewV4().String()
 		storeId := uuid.NewV4().String()
 		amount := 30.00
-		currency := "AKZ"
+		currency := "AOA"
 
 		transactionUseCase.On("RegisterStoreTransaction", accountFrom, storeId, amount, currency).Return(nil, errors.New("internal error"))
 
@@ -43,7 +60,7 @@ func TestRegisterStoreTransaction(t *testing.T) {
 		accountFrom, _ := entity.NewAccount(200)
 		store, _ := entity.NewStore("store", "store description", uuid.NewV4().String(), uuid.NewV4().String())
 
-		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 19, "AKZ")
+		transaction, _ := entity.NewTransaction(accountFrom, nil, nil, store, 19, "AOA")
 
 		transactionUseCase.On("RegisterStoreTransaction", accountFrom.ID, store.ID, transaction.Amount, transaction.Currency).Return(transaction, nil)
 
@@ -60,6 +77,24 @@ func TestRegisterStoreTransaction(t *testing.T) {
 
 func TestFindAllByStoreId(t *testing.T) {
 	t.Parallel()
+
+	t.Run("should fail on validate list transaction by store destination", func(t *testing.T) {
+		is := require.New(t)
+
+		storeId := uuid.NewV1().String()
+		page := 1
+		limit := -10
+		sort := "created_at DESC"
+
+		c := controller.NewStoreTransaction(nil)
+
+		result, total, err := c.FindAllByStoreId(context.TODO(), storeId, page, limit, sort)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+		is.Equal(0, total)
+	})
 
 	t.Run("should fail on list transaction by store destination", func(t *testing.T) {
 		is := require.New(t)
@@ -136,6 +171,21 @@ func TestFindAllByStoreId(t *testing.T) {
 
 func TestFindOneByStore(t *testing.T) {
 	t.Parallel()
+
+	t.Run("should fail on validate get transaction by store", func(t *testing.T) {
+		is := require.New(t)
+
+		transactionId := uuid.NewV1().String()
+		storeId := uuid.NewV1().String()
+
+		c := controller.NewStoreTransaction(nil)
+
+		result, err := c.FindOneByStore(context.TODO(), storeId, transactionId)
+
+		is.Nil(result)
+		is.NotNil(err)
+		is.Error(err)
+	})
 
 	t.Run("should fail on get transaction by store", func(t *testing.T) {
 		is := require.New(t)

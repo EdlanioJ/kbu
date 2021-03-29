@@ -7,6 +7,7 @@ import (
 	"github.com/EdlanioJ/kbu/payments/domain/entity"
 	"github.com/EdlanioJ/kbu/payments/domain/usecase"
 	"github.com/EdlanioJ/kbu/payments/presentation/utils/log"
+	"github.com/EdlanioJ/kbu/payments/presentation/validator"
 )
 
 var (
@@ -27,6 +28,13 @@ func NewAccountTransaction(Transaction usecase.AccountTransaction) *AccountTrans
 }
 
 func (c *AccountTransaction) RegisterAccountTransaction(ctx context.Context, fromId string, toId string, amount float64, currency string) (*entity.Transaction, error) {
+	err := validator.ValidateRegisterAccountTransactionParams(fromId, toId, amount, currency)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, err
+	}
 	transaction, err := c.Transaction.RegisterAccountTransaction(fromId, toId, amount, currency)
 
 	if err != nil {
@@ -38,6 +46,14 @@ func (c *AccountTransaction) RegisterAccountTransaction(ctx context.Context, fro
 }
 
 func (c *AccountTransaction) FindAllByAccountTo(ctx context.Context, accountId string, page int, limit int, sort string) ([]*entity.Transaction, int, error) {
+	err := validator.ValidateFindAllByAccountToParams(accountId, page, limit, sort)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, 0, err
+	}
+
 	transactions, total, err := c.Transaction.FindAllByAccountTo(accountId, page, limit, sort)
 
 	if err != nil {
@@ -54,6 +70,14 @@ func (c *AccountTransaction) FindAllByAccountTo(ctx context.Context, accountId s
 }
 
 func (c *AccountTransaction) FindOneByAccount(ctx context.Context, fromId string, transactionId string) (*entity.Transaction, error) {
+	err := validator.ValidateFindOneByAccountParams(fromId, transactionId)
+
+	if err != nil {
+		log.Warning(ctx, err.Error())
+
+		return nil, err
+	}
+
 	transaction, err := c.Transaction.FindOneByAccount(fromId, transactionId)
 
 	if err != nil {
