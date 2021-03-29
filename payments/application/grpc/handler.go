@@ -10,10 +10,10 @@ import (
 )
 
 type TransactionGrpcHandler struct {
-	Transaction        *controller.Transaction
-	AccountTransaction *controller.AccountTransaction
-	ServiceTransaction *controller.ServiceTransaction
-	StoreTransaction   *controller.StoreTransaction
+	TransactionController        *controller.Transaction
+	AccountTransactionController *controller.AccountTransaction
+	ServiceTransactionController *controller.ServiceTransaction
+	StoreTransactionController   *controller.StoreTransaction
 
 	pb.UnimplementedPaymentServiceServer
 }
@@ -26,16 +26,16 @@ func NewTransactionGrpcHandler(
 ) *TransactionGrpcHandler {
 
 	return &TransactionGrpcHandler{
-		Transaction:        transaction,
-		AccountTransaction: accountTransaction,
-		ServiceTransaction: serviceTransaction,
-		StoreTransaction:   storeTransaction,
+		TransactionController:        transaction,
+		AccountTransactionController: accountTransaction,
+		ServiceTransactionController: serviceTransaction,
+		StoreTransactionController:   storeTransaction,
 	}
 }
 
 func (t *TransactionGrpcHandler) List(ctx context.Context, in *pb.PaginationParams) (*pb.ListResult, error) {
 
-	result, total, err := t.Transaction.FindAll(ctx, int(in.Page), int(in.Limit), in.Sort)
+	result, total, err := t.TransactionController.FindAll(ctx, int(in.Page), int(in.Limit), in.Sort)
 
 	var transactions []*pb.Transaction
 
@@ -68,7 +68,7 @@ func (t *TransactionGrpcHandler) List(ctx context.Context, in *pb.PaginationPara
 }
 
 func (t *TransactionGrpcHandler) Get(ctx context.Context, in *pb.Params) (*pb.PaymentResult, error) {
-	result, err := t.Transaction.Find(ctx, in.ID)
+	result, err := t.TransactionController.Find(ctx, in.ID)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -93,7 +93,7 @@ func (t *TransactionGrpcHandler) Get(ctx context.Context, in *pb.Params) (*pb.Pa
 }
 
 func (t *TransactionGrpcHandler) Complete(ctx context.Context, in *pb.Params) (*pb.PaymentResult, error) {
-	result, err := t.Transaction.Complete(ctx, in.ID)
+	result, err := t.TransactionController.Complete(ctx, in.ID)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -118,7 +118,7 @@ func (t *TransactionGrpcHandler) Complete(ctx context.Context, in *pb.Params) (*
 }
 
 func (t *TransactionGrpcHandler) Error(ctx context.Context, in *pb.Params) (*pb.PaymentResult, error) {
-	result, err := t.Transaction.Error(ctx, in.ID)
+	result, err := t.TransactionController.Error(ctx, in.ID)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -143,7 +143,7 @@ func (t *TransactionGrpcHandler) Error(ctx context.Context, in *pb.Params) (*pb.
 }
 
 func (t *TransactionGrpcHandler) GetByAccountDestination(ctx context.Context, in *pb.GetByParams) (*pb.PaymentResult, error) {
-	result, err := t.AccountTransaction.FindOneByAccount(ctx, in.Id, in.TransactionID)
+	result, err := t.AccountTransactionController.FindOneByAccount(ctx, in.Id, in.TransactionID)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -166,7 +166,7 @@ func (t *TransactionGrpcHandler) GetByAccountDestination(ctx context.Context, in
 }
 
 func (t *TransactionGrpcHandler) ListByAccountDestination(ctx context.Context, in *pb.ListByParams) (*pb.ListResult, error) {
-	result, total, err := t.AccountTransaction.FindAllByAccountTo(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
+	result, total, err := t.AccountTransactionController.FindAllByAccountTo(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
 
 	var transactions []*pb.Transaction
 
@@ -197,7 +197,7 @@ func (t *TransactionGrpcHandler) ListByAccountDestination(ctx context.Context, i
 }
 
 func (t *TransactionGrpcHandler) RegisterAccountPayment(ctx context.Context, in *pb.CreateParams) (*pb.PaymentResult, error) {
-	result, err := t.AccountTransaction.RegisterAccountTransaction(ctx, in.FromID, in.DestinationID, float64(in.Amount), in.Currency)
+	result, err := t.AccountTransactionController.RegisterAccountTransaction(ctx, in.FromID, in.DestinationID, float64(in.Amount), in.Currency)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -220,7 +220,7 @@ func (t *TransactionGrpcHandler) RegisterAccountPayment(ctx context.Context, in 
 }
 
 func (t *TransactionGrpcHandler) GetByService(ctx context.Context, in *pb.GetByParams) (*pb.PaymentResult, error) {
-	result, err := t.StoreTransaction.FindOneByStore(ctx, in.Id, in.TransactionID)
+	result, err := t.StoreTransactionController.FindOneByStore(ctx, in.Id, in.TransactionID)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -242,7 +242,7 @@ func (t *TransactionGrpcHandler) GetByService(ctx context.Context, in *pb.GetByP
 	}, nil
 }
 func (t *TransactionGrpcHandler) ListByService(ctx context.Context, in *pb.ListByParams) (*pb.ListResult, error) {
-	result, total, err := t.ServiceTransaction.FindAllByServiceId(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
+	result, total, err := t.ServiceTransactionController.FindAllByServiceId(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
 
 	var transactions []*pb.Transaction
 
@@ -273,7 +273,7 @@ func (t *TransactionGrpcHandler) ListByService(ctx context.Context, in *pb.ListB
 
 }
 func (t *TransactionGrpcHandler) RegisterServicePayment(ctx context.Context, in *pb.CreateServiceParams) (*pb.PaymentResult, error) {
-	result, err := t.ServiceTransaction.RegisterServiceTransaction(ctx, in.FromID, in.ServiceID, in.ServicePriceID, float64(in.Amount), in.Currency)
+	result, err := t.ServiceTransactionController.RegisterServiceTransaction(ctx, in.FromID, in.ServiceID, in.ServicePriceID, float64(in.Amount), in.Currency)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -296,7 +296,7 @@ func (t *TransactionGrpcHandler) RegisterServicePayment(ctx context.Context, in 
 }
 
 func (t *TransactionGrpcHandler) GetByStore(ctx context.Context, in *pb.GetByParams) (*pb.PaymentResult, error) {
-	result, err := t.StoreTransaction.FindOneByStore(ctx, in.Id, in.TransactionID)
+	result, err := t.StoreTransactionController.FindOneByStore(ctx, in.Id, in.TransactionID)
 
 	if err != nil {
 		return &pb.PaymentResult{
@@ -318,7 +318,7 @@ func (t *TransactionGrpcHandler) GetByStore(ctx context.Context, in *pb.GetByPar
 	}, nil
 }
 func (t *TransactionGrpcHandler) ListByStore(ctx context.Context, in *pb.ListByParams) (*pb.ListResult, error) {
-	result, total, err := t.StoreTransaction.FindAllByStoreId(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
+	result, total, err := t.StoreTransactionController.FindAllByStoreId(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
 
 	var transactions []*pb.Transaction
 
@@ -348,7 +348,7 @@ func (t *TransactionGrpcHandler) ListByStore(ctx context.Context, in *pb.ListByP
 	}, nil
 }
 func (t *TransactionGrpcHandler) RegisterStorePayment(ctx context.Context, in *pb.CreateParams) (*pb.PaymentResult, error) {
-	result, err := t.StoreTransaction.RegisterStoreTransaction(ctx, in.FromID, in.DestinationID, float64(in.Amount), in.Currency)
+	result, err := t.StoreTransactionController.RegisterStoreTransaction(ctx, in.FromID, in.DestinationID, float64(in.Amount), in.Currency)
 
 	if err != nil {
 		return &pb.PaymentResult{
