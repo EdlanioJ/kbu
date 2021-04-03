@@ -4,40 +4,11 @@ package github.com.edlanioj.kbu.payments;
 
 option go_package = "application/grpc/protofiles;pb";
 
-message PaginationParams {
-  int32 page = 1;
-  int32 limit = 2;
-  string sort = 3;
-}
 
-message Params {
-  string ID = 1;
-}
-
-
-message GetByParams {
-  string id = 1;
-  string transactionID = 2;
-}
-
-message CreateParams {
-  string fromID = 1;
-  string destinationID = 2;
-  float amount = 3;
-  string currency = 4;
-}
-
-message CreateServiceParams {
-  string fromID = 1;
-  string serviceID = 2;
-  string servicePriceID = 3;
-  float amount = 4;
-  string currency = 5;
-}
-
-message ListByParams {
-  string ID = 1;
-  PaginationParams pagination = 2;
+enum TransactionType {
+  to_user = 0;
+	to_service = 1;
+	to_store = 2;
 }
 
 message Transaction {
@@ -45,40 +16,74 @@ message Transaction {
   float amount = 2;
   string status = 3;
   string currency = 4;
-  string fromID = 5;
-  string toID = 6;
-  string serviceID = 7;
-  string storeID = 8;
+  string accountFrom = 5;
+  string accountTo = 6;
+  string type = 7;
+  string externalID = 8;
   string createdAt = 9;
   string updatedAt = 10;
 }
 
-message ListResult {
+message PaginationRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort = 3;
+}
+
+message Request {
+  string ID = 1;
+}
+
+message RegisterRequest {
+  string accountFrom = 1;
+  string accountTo = 2;
+  string externalID = 3;
+  TransactionType type = 4;
+  string currency = 5;
+  float amount = 6;
+}
+
+message GetRequest {
+  string id = 1;
+  string transactionID = 2;
+}
+
+message GetByTypeRequest {
+  TransactionType type = 1;
+  string transactionID = 2;
+}
+
+message ListByTypeRequest {
+  TransactionType type = 1;
+  PaginationRequest pagination = 2;
+}
+
+message ListRequest {
+  string ID = 1;
+  PaginationRequest pagination = 2;
+}
+
+message ListResponse {
   repeated Transaction transactions = 1;
   int32 total = 2;
   string error = 3;
 }
 
-message PaymentResult {
+message Response {
   Transaction transaction = 1;
   string error = 2;
 }
 
 service PaymentService {
-  rpc List (PaginationParams) returns (ListResult) {};
-  rpc Get (Params) returns (PaymentResult) {};
-  rpc Complete (Params) returns (PaymentResult) {};
-  rpc Error (Params) returns (PaymentResult) {};
-  
-  rpc GetByAccountDestination (GetByParams) returns (PaymentResult) {};
-  rpc ListByAccountDestination (ListByParams) returns (ListResult) {};
-  rpc RegisterAccountPayment (CreateParams) returns (PaymentResult) {};
-
-  rpc GetByService (GetByParams) returns (PaymentResult) {};
-  rpc ListByService (ListByParams) returns (ListResult) {};
-  rpc RegisterServicePayment (CreateServiceParams) returns (PaymentResult) {};
-
-  rpc GetByStore (GetByParams) returns (PaymentResult) {};
-  rpc ListByStore (ListByParams) returns (ListResult) {};
-  rpc RegisterStorePayment (CreateParams) returns (PaymentResult) {};
+  rpc Register (RegisterRequest) returns (Response);
+  rpc Get (Request) returns (Response);
+  rpc List (PaginationRequest) returns (ListResponse);
+  rpc GetByType (GetByTypeRequest) returns (Response);
+  rpc ListByType (ListByTypeRequest) returns (ListResponse);
+  rpc GetByReference (GetRequest) returns (Response);
+  rpc ListByReference (ListRequest) returns (ListResponse);
+  rpc GetByAccountFrom (GetRequest) returns (Response);
+  rpc ListByAccountFrom (ListRequest) returns (ListResponse);
+  rpc GetByAccountTo (GetRequest) returns (Response);
+  rpc ListByAccountTo (ListRequest) returns (ListResponse);
 }

@@ -11,7 +11,11 @@ import (
 const (
 	TransactionPending   string = "pending"
 	TransactionCompleted string = "completed"
-	TransactionError     string = "error"
+	TransactionCanceled  string = "canceled"
+
+	TransactionToUser    string = "to_user"
+	TransactionToService string = "to_service"
+	TransactionToStore   string = "to_store"
 )
 
 type Transaction struct {
@@ -20,13 +24,11 @@ type Transaction struct {
 	Status        string   `json:"status" gorm:"type:varchar(20)" valid:"notnull"`
 	Currency      string   `json:"currency" gorm:"type:varchar(5)" valid:"notnull"`
 	AccountFrom   *Account `valid:"-"`
-	AccountFromID string   `json:"account_from,omitempty" gorm:"column:account_from_id;type:uuid;not null" valid:"notnull,uuidv4"`
-	Service       *Service `valid:"-"`
-	ServiceID     string   `json:"service,omitempty" gorm:"column:service_id;type:uuid;default:null" valid:"optional,uuidv4"`
-	Store         *Store   `valid:"-"`
-	StoreID       string   `json:"store,omitempty" gorm:"column:store_id;type:uuid;default:null" valid:"optional,uuidv4"`
+	AccountFromID string   `json:"account_from" gorm:"column:account_from_id;type:uuid;not null" valid:"notnull,uuidv4"`
 	AccountTo     *Account `valid:"-"`
-	AccountToID   string   `json:"account_to,omitempty" gorm:"column:account_to_id;type:uuid;default:null" valid:"optional,uuidv4"`
+	AccountToID   string   `json:"account_to" gorm:"column:account_to_id;type:uuid;default:null" valid:"notnull,uuidv4"`
+	Type          string   `json:"type" gorm:"type:varchar(30)" valid:"notnull"`
+	ExternalID    string   `json:"external_id" gorm:"column:external_id;type:uuid" valid:"notnull,uuidv4"`
 }
 
 func (t *Transaction) isValid() error {
@@ -40,13 +42,17 @@ func (t *Transaction) isValid() error {
 		return errors.New("the amount must be greater than 0")
 	}
 
-	if t.Status != TransactionPending && t.Status != TransactionCompleted && t.Status != TransactionError {
+	if t.Type != TransactionToUser && t.Type != TransactionToService && t.Type != TransactionToStore {
+		return errors.New("invalid type transaction")
+	}
+
+	if t.Status != TransactionPending && t.Status != TransactionCompleted && t.Status != TransactionCanceled {
 		return errors.New("invalid status")
 	}
 	return nil
 }
 
-func NewTransaction(accountFrom *Account, accountTo *Account, service *Service, store *Store, amount float64, currency string) (*Transaction, error) {
+func NewTransaction(accountFrom *Account, accountTo *Account, externalID, transactionType, currency string, amount float64) (*Transaction, error) {
 	if currency == "" {
 		currency = "AOA"
 	}
@@ -57,22 +63,12 @@ func NewTransaction(accountFrom *Account, accountTo *Account, service *Service, 
 		AccountFrom:   accountFrom,
 		AccountFromID: accountFrom.ID,
 		AccountTo:     accountTo,
-		Service:       service,
-		Store:         store,
+		AccountToID:   accountTo.ID,
+		ExternalID:    externalID,
+		Type:          transactionType,
 		Status:        TransactionPending,
 	}
 
-	if accountTo != nil {
-		transaction.AccountToID = accountTo.ID
-	}
-
-	if service != nil {
-		transaction.ServiceID = service.ID
-	}
-
-	if store != nil {
-		transaction.StoreID = store.ID
-	}
 	transaction.ID = uuid.NewV4().String()
 	transaction.CreatedAt = time.Now()
 

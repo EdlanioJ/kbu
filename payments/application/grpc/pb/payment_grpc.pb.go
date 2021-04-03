@@ -18,19 +18,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PaymentServiceClient interface {
-	List(ctx context.Context, in *PaginationParams, opts ...grpc.CallOption) (*ListResult, error)
-	Get(ctx context.Context, in *Params, opts ...grpc.CallOption) (*PaymentResult, error)
-	Complete(ctx context.Context, in *Params, opts ...grpc.CallOption) (*PaymentResult, error)
-	Error(ctx context.Context, in *Params, opts ...grpc.CallOption) (*PaymentResult, error)
-	GetByAccountDestination(ctx context.Context, in *GetByParams, opts ...grpc.CallOption) (*PaymentResult, error)
-	ListByAccountDestination(ctx context.Context, in *ListByParams, opts ...grpc.CallOption) (*ListResult, error)
-	RegisterAccountPayment(ctx context.Context, in *CreateParams, opts ...grpc.CallOption) (*PaymentResult, error)
-	GetByService(ctx context.Context, in *GetByParams, opts ...grpc.CallOption) (*PaymentResult, error)
-	ListByService(ctx context.Context, in *ListByParams, opts ...grpc.CallOption) (*ListResult, error)
-	RegisterServicePayment(ctx context.Context, in *CreateServiceParams, opts ...grpc.CallOption) (*PaymentResult, error)
-	GetByStore(ctx context.Context, in *GetByParams, opts ...grpc.CallOption) (*PaymentResult, error)
-	ListByStore(ctx context.Context, in *ListByParams, opts ...grpc.CallOption) (*ListResult, error)
-	RegisterStorePayment(ctx context.Context, in *CreateParams, opts ...grpc.CallOption) (*PaymentResult, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Response, error)
+	Get(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	List(ctx context.Context, in *PaginationRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	GetByType(ctx context.Context, in *GetByTypeRequest, opts ...grpc.CallOption) (*Response, error)
+	ListByType(ctx context.Context, in *ListByTypeRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	GetByReference(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*Response, error)
+	ListByReference(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	GetByAccountFrom(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*Response, error)
+	ListByAccountFrom(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	GetByAccountTo(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*Response, error)
+	ListByAccountTo(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 }
 
 type paymentServiceClient struct {
@@ -41,17 +39,17 @@ func NewPaymentServiceClient(cc grpc.ClientConnInterface) PaymentServiceClient {
 	return &paymentServiceClient{cc}
 }
 
-func (c *paymentServiceClient) List(ctx context.Context, in *PaginationParams, opts ...grpc.CallOption) (*ListResult, error) {
-	out := new(ListResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/List", in, out, opts...)
+func (c *paymentServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) Get(ctx context.Context, in *Params, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
+func (c *paymentServiceClient) Get(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -59,99 +57,81 @@ func (c *paymentServiceClient) Get(ctx context.Context, in *Params, opts ...grpc
 	return out, nil
 }
 
-func (c *paymentServiceClient) Complete(ctx context.Context, in *Params, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/Complete", in, out, opts...)
+func (c *paymentServiceClient) List(ctx context.Context, in *PaginationRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) Error(ctx context.Context, in *Params, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/Error", in, out, opts...)
+func (c *paymentServiceClient) GetByType(ctx context.Context, in *GetByTypeRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/GetByType", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) GetByAccountDestination(ctx context.Context, in *GetByParams, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/GetByAccountDestination", in, out, opts...)
+func (c *paymentServiceClient) ListByType(ctx context.Context, in *ListByTypeRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/ListByType", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) ListByAccountDestination(ctx context.Context, in *ListByParams, opts ...grpc.CallOption) (*ListResult, error) {
-	out := new(ListResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/ListByAccountDestination", in, out, opts...)
+func (c *paymentServiceClient) GetByReference(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/GetByReference", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) RegisterAccountPayment(ctx context.Context, in *CreateParams, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/RegisterAccountPayment", in, out, opts...)
+func (c *paymentServiceClient) ListByReference(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/ListByReference", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) GetByService(ctx context.Context, in *GetByParams, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/GetByService", in, out, opts...)
+func (c *paymentServiceClient) GetByAccountFrom(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/GetByAccountFrom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) ListByService(ctx context.Context, in *ListByParams, opts ...grpc.CallOption) (*ListResult, error) {
-	out := new(ListResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/ListByService", in, out, opts...)
+func (c *paymentServiceClient) ListByAccountFrom(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/ListByAccountFrom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) RegisterServicePayment(ctx context.Context, in *CreateServiceParams, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/RegisterServicePayment", in, out, opts...)
+func (c *paymentServiceClient) GetByAccountTo(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/GetByAccountTo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *paymentServiceClient) GetByStore(ctx context.Context, in *GetByParams, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/GetByStore", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *paymentServiceClient) ListByStore(ctx context.Context, in *ListByParams, opts ...grpc.CallOption) (*ListResult, error) {
-	out := new(ListResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/ListByStore", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *paymentServiceClient) RegisterStorePayment(ctx context.Context, in *CreateParams, opts ...grpc.CallOption) (*PaymentResult, error) {
-	out := new(PaymentResult)
-	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/RegisterStorePayment", in, out, opts...)
+func (c *paymentServiceClient) ListByAccountTo(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/github.com.edlanioj.kbu.payments.PaymentService/ListByAccountTo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -162,19 +142,17 @@ func (c *paymentServiceClient) RegisterStorePayment(ctx context.Context, in *Cre
 // All implementations must embed UnimplementedPaymentServiceServer
 // for forward compatibility
 type PaymentServiceServer interface {
-	List(context.Context, *PaginationParams) (*ListResult, error)
-	Get(context.Context, *Params) (*PaymentResult, error)
-	Complete(context.Context, *Params) (*PaymentResult, error)
-	Error(context.Context, *Params) (*PaymentResult, error)
-	GetByAccountDestination(context.Context, *GetByParams) (*PaymentResult, error)
-	ListByAccountDestination(context.Context, *ListByParams) (*ListResult, error)
-	RegisterAccountPayment(context.Context, *CreateParams) (*PaymentResult, error)
-	GetByService(context.Context, *GetByParams) (*PaymentResult, error)
-	ListByService(context.Context, *ListByParams) (*ListResult, error)
-	RegisterServicePayment(context.Context, *CreateServiceParams) (*PaymentResult, error)
-	GetByStore(context.Context, *GetByParams) (*PaymentResult, error)
-	ListByStore(context.Context, *ListByParams) (*ListResult, error)
-	RegisterStorePayment(context.Context, *CreateParams) (*PaymentResult, error)
+	Register(context.Context, *RegisterRequest) (*Response, error)
+	Get(context.Context, *Request) (*Response, error)
+	List(context.Context, *PaginationRequest) (*ListResponse, error)
+	GetByType(context.Context, *GetByTypeRequest) (*Response, error)
+	ListByType(context.Context, *ListByTypeRequest) (*ListResponse, error)
+	GetByReference(context.Context, *GetRequest) (*Response, error)
+	ListByReference(context.Context, *ListRequest) (*ListResponse, error)
+	GetByAccountFrom(context.Context, *GetRequest) (*Response, error)
+	ListByAccountFrom(context.Context, *ListRequest) (*ListResponse, error)
+	GetByAccountTo(context.Context, *GetRequest) (*Response, error)
+	ListByAccountTo(context.Context, *ListRequest) (*ListResponse, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }
 
@@ -182,44 +160,38 @@ type PaymentServiceServer interface {
 type UnimplementedPaymentServiceServer struct {
 }
 
-func (UnimplementedPaymentServiceServer) List(context.Context, *PaginationParams) (*ListResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+func (UnimplementedPaymentServiceServer) Register(context.Context, *RegisterRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedPaymentServiceServer) Get(context.Context, *Params) (*PaymentResult, error) {
+func (UnimplementedPaymentServiceServer) Get(context.Context, *Request) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedPaymentServiceServer) Complete(context.Context, *Params) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Complete not implemented")
+func (UnimplementedPaymentServiceServer) List(context.Context, *PaginationRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedPaymentServiceServer) Error(context.Context, *Params) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Error not implemented")
+func (UnimplementedPaymentServiceServer) GetByType(context.Context, *GetByTypeRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByType not implemented")
 }
-func (UnimplementedPaymentServiceServer) GetByAccountDestination(context.Context, *GetByParams) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByAccountDestination not implemented")
+func (UnimplementedPaymentServiceServer) ListByType(context.Context, *ListByTypeRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListByType not implemented")
 }
-func (UnimplementedPaymentServiceServer) ListByAccountDestination(context.Context, *ListByParams) (*ListResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListByAccountDestination not implemented")
+func (UnimplementedPaymentServiceServer) GetByReference(context.Context, *GetRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByReference not implemented")
 }
-func (UnimplementedPaymentServiceServer) RegisterAccountPayment(context.Context, *CreateParams) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterAccountPayment not implemented")
+func (UnimplementedPaymentServiceServer) ListByReference(context.Context, *ListRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListByReference not implemented")
 }
-func (UnimplementedPaymentServiceServer) GetByService(context.Context, *GetByParams) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByService not implemented")
+func (UnimplementedPaymentServiceServer) GetByAccountFrom(context.Context, *GetRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByAccountFrom not implemented")
 }
-func (UnimplementedPaymentServiceServer) ListByService(context.Context, *ListByParams) (*ListResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListByService not implemented")
+func (UnimplementedPaymentServiceServer) ListByAccountFrom(context.Context, *ListRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListByAccountFrom not implemented")
 }
-func (UnimplementedPaymentServiceServer) RegisterServicePayment(context.Context, *CreateServiceParams) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterServicePayment not implemented")
+func (UnimplementedPaymentServiceServer) GetByAccountTo(context.Context, *GetRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByAccountTo not implemented")
 }
-func (UnimplementedPaymentServiceServer) GetByStore(context.Context, *GetByParams) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByStore not implemented")
-}
-func (UnimplementedPaymentServiceServer) ListByStore(context.Context, *ListByParams) (*ListResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListByStore not implemented")
-}
-func (UnimplementedPaymentServiceServer) RegisterStorePayment(context.Context, *CreateParams) (*PaymentResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterStorePayment not implemented")
+func (UnimplementedPaymentServiceServer) ListByAccountTo(context.Context, *ListRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListByAccountTo not implemented")
 }
 func (UnimplementedPaymentServiceServer) mustEmbedUnimplementedPaymentServiceServer() {}
 
@@ -234,26 +206,26 @@ func RegisterPaymentServiceServer(s grpc.ServiceRegistrar, srv PaymentServiceSer
 	s.RegisterService(&PaymentService_ServiceDesc, srv)
 }
 
-func _PaymentService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PaginationParams)
+func _PaymentService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).List(ctx, in)
+		return srv.(PaymentServiceServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/List",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).List(ctx, req.(*PaginationParams))
+		return srv.(PaymentServiceServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _PaymentService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Params)
+	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -265,205 +237,169 @@ func _PaymentService_Get_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).Get(ctx, req.(*Params))
+		return srv.(PaymentServiceServer).Get(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_Complete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Params)
+func _PaymentService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PaginationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).Complete(ctx, in)
+		return srv.(PaymentServiceServer).List(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/Complete",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).Complete(ctx, req.(*Params))
+		return srv.(PaymentServiceServer).List(ctx, req.(*PaginationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_Error_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Params)
+func _PaymentService_GetByType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByTypeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).Error(ctx, in)
+		return srv.(PaymentServiceServer).GetByType(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/Error",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/GetByType",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).Error(ctx, req.(*Params))
+		return srv.(PaymentServiceServer).GetByType(ctx, req.(*GetByTypeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_GetByAccountDestination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByParams)
+func _PaymentService_ListByType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListByTypeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).GetByAccountDestination(ctx, in)
+		return srv.(PaymentServiceServer).ListByType(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/GetByAccountDestination",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/ListByType",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).GetByAccountDestination(ctx, req.(*GetByParams))
+		return srv.(PaymentServiceServer).ListByType(ctx, req.(*ListByTypeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_ListByAccountDestination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListByParams)
+func _PaymentService_GetByReference_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).ListByAccountDestination(ctx, in)
+		return srv.(PaymentServiceServer).GetByReference(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/ListByAccountDestination",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/GetByReference",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).ListByAccountDestination(ctx, req.(*ListByParams))
+		return srv.(PaymentServiceServer).GetByReference(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_RegisterAccountPayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateParams)
+func _PaymentService_ListByReference_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).RegisterAccountPayment(ctx, in)
+		return srv.(PaymentServiceServer).ListByReference(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/RegisterAccountPayment",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/ListByReference",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).RegisterAccountPayment(ctx, req.(*CreateParams))
+		return srv.(PaymentServiceServer).ListByReference(ctx, req.(*ListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_GetByService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByParams)
+func _PaymentService_GetByAccountFrom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).GetByService(ctx, in)
+		return srv.(PaymentServiceServer).GetByAccountFrom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/GetByService",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/GetByAccountFrom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).GetByService(ctx, req.(*GetByParams))
+		return srv.(PaymentServiceServer).GetByAccountFrom(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_ListByService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListByParams)
+func _PaymentService_ListByAccountFrom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).ListByService(ctx, in)
+		return srv.(PaymentServiceServer).ListByAccountFrom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/ListByService",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/ListByAccountFrom",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).ListByService(ctx, req.(*ListByParams))
+		return srv.(PaymentServiceServer).ListByAccountFrom(ctx, req.(*ListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_RegisterServicePayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateServiceParams)
+func _PaymentService_GetByAccountTo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).RegisterServicePayment(ctx, in)
+		return srv.(PaymentServiceServer).GetByAccountTo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/RegisterServicePayment",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/GetByAccountTo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).RegisterServicePayment(ctx, req.(*CreateServiceParams))
+		return srv.(PaymentServiceServer).GetByAccountTo(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PaymentService_GetByStore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByParams)
+func _PaymentService_ListByAccountTo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PaymentServiceServer).GetByStore(ctx, in)
+		return srv.(PaymentServiceServer).ListByAccountTo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/GetByStore",
+		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/ListByAccountTo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).GetByStore(ctx, req.(*GetByParams))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PaymentService_ListByStore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListByParams)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PaymentServiceServer).ListByStore(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/ListByStore",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).ListByStore(ctx, req.(*ListByParams))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PaymentService_RegisterStorePayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateParams)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PaymentServiceServer).RegisterStorePayment(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/github.com.edlanioj.kbu.payments.PaymentService/RegisterStorePayment",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PaymentServiceServer).RegisterStorePayment(ctx, req.(*CreateParams))
+		return srv.(PaymentServiceServer).ListByAccountTo(ctx, req.(*ListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -476,56 +412,48 @@ var PaymentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PaymentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "List",
-			Handler:    _PaymentService_List_Handler,
+			MethodName: "Register",
+			Handler:    _PaymentService_Register_Handler,
 		},
 		{
 			MethodName: "Get",
 			Handler:    _PaymentService_Get_Handler,
 		},
 		{
-			MethodName: "Complete",
-			Handler:    _PaymentService_Complete_Handler,
+			MethodName: "List",
+			Handler:    _PaymentService_List_Handler,
 		},
 		{
-			MethodName: "Error",
-			Handler:    _PaymentService_Error_Handler,
+			MethodName: "GetByType",
+			Handler:    _PaymentService_GetByType_Handler,
 		},
 		{
-			MethodName: "GetByAccountDestination",
-			Handler:    _PaymentService_GetByAccountDestination_Handler,
+			MethodName: "ListByType",
+			Handler:    _PaymentService_ListByType_Handler,
 		},
 		{
-			MethodName: "ListByAccountDestination",
-			Handler:    _PaymentService_ListByAccountDestination_Handler,
+			MethodName: "GetByReference",
+			Handler:    _PaymentService_GetByReference_Handler,
 		},
 		{
-			MethodName: "RegisterAccountPayment",
-			Handler:    _PaymentService_RegisterAccountPayment_Handler,
+			MethodName: "ListByReference",
+			Handler:    _PaymentService_ListByReference_Handler,
 		},
 		{
-			MethodName: "GetByService",
-			Handler:    _PaymentService_GetByService_Handler,
+			MethodName: "GetByAccountFrom",
+			Handler:    _PaymentService_GetByAccountFrom_Handler,
 		},
 		{
-			MethodName: "ListByService",
-			Handler:    _PaymentService_ListByService_Handler,
+			MethodName: "ListByAccountFrom",
+			Handler:    _PaymentService_ListByAccountFrom_Handler,
 		},
 		{
-			MethodName: "RegisterServicePayment",
-			Handler:    _PaymentService_RegisterServicePayment_Handler,
+			MethodName: "GetByAccountTo",
+			Handler:    _PaymentService_GetByAccountTo_Handler,
 		},
 		{
-			MethodName: "GetByStore",
-			Handler:    _PaymentService_GetByStore_Handler,
-		},
-		{
-			MethodName: "ListByStore",
-			Handler:    _PaymentService_ListByStore_Handler,
-		},
-		{
-			MethodName: "RegisterStorePayment",
-			Handler:    _PaymentService_RegisterStorePayment_Handler,
+			MethodName: "ListByAccountTo",
+			Handler:    _PaymentService_ListByAccountTo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

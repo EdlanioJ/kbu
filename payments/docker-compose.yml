@@ -1,15 +1,15 @@
-version: "3"
+version: '3'
 
 services:
   app:
     container_name: kbu-payment
     build: .
     ports:
-    - "50051:50051"
+      - '50051:50051'
     volumes:
       - .:/go/src/
     extra_hosts:
-      - "host.docker.internal:172.17.0.1"
+      - 'host.docker.internal:172.17.0.1'
 
   db:
     container_name: kbu-db
@@ -22,7 +22,7 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=kbu_payments
     ports:
-      - "25432:5432"
+      - '25432:5432'
 
   pgadmin:
     image: dpage/pgadmin4
@@ -31,7 +31,6 @@ services:
       - PGADMIN_DEFAULT_EMAIL=admin@user.com
       - PGADMIN_DEFAULT_PASSWORD=123456
     ports:
-      - "9003:80"
+      - '9003:80'
     depends_on:
       - db
-

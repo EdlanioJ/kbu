@@ -10,362 +10,318 @@ import (
 )
 
 type TransactionGrpcHandler struct {
-	TransactionController        *controller.Transaction
-	AccountTransactionController *controller.AccountTransaction
-	ServiceTransactionController *controller.ServiceTransaction
-	StoreTransactionController   *controller.StoreTransaction
+	TransactionController *controller.Transaction
 
 	pb.UnimplementedPaymentServiceServer
 }
 
 func NewTransactionGrpcHandler(
 	transaction *controller.Transaction,
-	accountTransaction *controller.AccountTransaction,
-	serviceTransaction *controller.ServiceTransaction,
-	storeTransaction *controller.StoreTransaction,
 ) *TransactionGrpcHandler {
 
 	return &TransactionGrpcHandler{
-		TransactionController:        transaction,
-		AccountTransactionController: accountTransaction,
-		ServiceTransactionController: serviceTransaction,
-		StoreTransactionController:   storeTransaction,
+		TransactionController: transaction,
 	}
 }
 
-func (t *TransactionGrpcHandler) List(ctx context.Context, in *pb.PaginationParams) (*pb.ListResult, error) {
+func (t *TransactionGrpcHandler) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.Response, error) {
+	response, err := t.TransactionController.Register(ctx, in.AccountFrom, in.AccountFrom, in.ExternalID, in.Type.String(), in.Currency, float64(in.Amount))
 
-	result, total, err := t.TransactionController.FindAll(ctx, int(in.Page), int(in.Limit), in.Sort)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
+	return &pb.Response{
+		Transaction: &pb.Transaction{
+			ID:          response.ID,
+			Amount:      float32(response.Amount),
+			Status:      response.Status,
+			Currency:    response.Currency,
+			AccountFrom: response.AccountFromID,
+			AccountTo:   response.AccountToID,
+			Type:        response.Type,
+			ExternalID:  response.ExternalID,
+			CreatedAt:   response.CreatedAt.String(),
+			UpdatedAt:   response.UpdatedAt.String(),
+		},
+	}, nil
+}
+func (t *TransactionGrpcHandler) Get(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+	response, err := t.TransactionController.Get(ctx, in.ID)
+
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	return &pb.Response{
+		Transaction: &pb.Transaction{
+			ID:          response.ID,
+			Amount:      float32(response.Amount),
+			Status:      response.Status,
+			Currency:    response.Currency,
+			AccountFrom: response.AccountFromID,
+			AccountTo:   response.AccountToID,
+			Type:        response.Type,
+			ExternalID:  response.ExternalID,
+			CreatedAt:   response.CreatedAt.String(),
+			UpdatedAt:   response.UpdatedAt.String(),
+		},
+	}, nil
+}
+
+func (t *TransactionGrpcHandler) List(ctx context.Context, in *pb.PaginationRequest) (*pb.ListResponse, error) {
+	response, total, err := t.TransactionController.List(ctx, int(in.Page), int(in.Limit), in.Sort)
 	var transactions []*pb.Transaction
 
 	if err != nil {
-		return &pb.ListResult{
-			Total: 0,
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	for _, value := range result {
+	if transactions == nil {
+		return nil, status.Error(codes.NotFound, "no payment was found")
+	}
+
+	for _, value := range response {
 		transactions = append(transactions, &pb.Transaction{
-			ID:        value.ID,
-			Amount:    float32(value.Amount),
-			Status:    value.Status,
-			Currency:  value.Currency,
-			FromID:    value.AccountFromID,
-			ToID:      value.AccountToID,
-			ServiceID: value.ServiceID,
-			StoreID:   value.StoreID,
-			CreatedAt: value.CreatedAt.String(),
-			UpdatedAt: value.UpdatedAt.String(),
+			ID:          value.ID,
+			Amount:      float32(value.Amount),
+			Status:      value.Status,
+			Currency:    value.Currency,
+			AccountFrom: value.AccountFromID,
+			AccountTo:   value.AccountToID,
+			Type:        value.Type,
+			ExternalID:  value.ExternalID,
+			CreatedAt:   value.CreatedAt.String(),
+			UpdatedAt:   value.UpdatedAt.String(),
 		})
 	}
 
-	return &pb.ListResult{
+	return &pb.ListResponse{
 		Transactions: transactions,
 		Total:        int32(total),
 	}, nil
 }
 
-func (t *TransactionGrpcHandler) Get(ctx context.Context, in *pb.Params) (*pb.PaymentResult, error) {
-	result, err := t.TransactionController.Find(ctx, in.ID)
+func (t *TransactionGrpcHandler) GetByType(ctx context.Context, in *pb.GetByTypeRequest) (*pb.Response, error) {
+	response, err := t.TransactionController.GetByType(ctx, in.TransactionID, in.Type.String())
 
 	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	return &pb.PaymentResult{
+	return &pb.Response{
 		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			ToID:      result.AccountToID,
-			ServiceID: result.ServiceID,
-			StoreID:   result.StoreID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
+			ID:          response.ID,
+			Amount:      float32(response.Amount),
+			Status:      response.Status,
+			Currency:    response.Currency,
+			AccountFrom: response.AccountFromID,
+			AccountTo:   response.AccountToID,
+			Type:        response.Type,
+			ExternalID:  response.ExternalID,
+			CreatedAt:   response.CreatedAt.String(),
+			UpdatedAt:   response.UpdatedAt.String(),
 		},
 	}, nil
 }
 
-func (t *TransactionGrpcHandler) Complete(ctx context.Context, in *pb.Params) (*pb.PaymentResult, error) {
-	result, err := t.TransactionController.Complete(ctx, in.ID)
-
-	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.Canceled, err.Error())
-	}
-
-	return &pb.PaymentResult{
-		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			ToID:      result.AccountToID,
-			ServiceID: result.ServiceID,
-			StoreID:   result.StoreID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
-		},
-	}, nil
-}
-
-func (t *TransactionGrpcHandler) Error(ctx context.Context, in *pb.Params) (*pb.PaymentResult, error) {
-	result, err := t.TransactionController.Error(ctx, in.ID)
-
-	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.Canceled, err.Error())
-	}
-
-	return &pb.PaymentResult{
-		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			ToID:      result.AccountToID,
-			ServiceID: result.ServiceID,
-			StoreID:   result.StoreID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
-		},
-	}, nil
-}
-
-func (t *TransactionGrpcHandler) GetByAccountDestination(ctx context.Context, in *pb.GetByParams) (*pb.PaymentResult, error) {
-	result, err := t.AccountTransactionController.FindOneByAccount(ctx, in.Id, in.TransactionID)
-
-	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
-	}
-
-	return &pb.PaymentResult{
-		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			ToID:      result.AccountToID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
-		},
-	}, nil
-}
-
-func (t *TransactionGrpcHandler) ListByAccountDestination(ctx context.Context, in *pb.ListByParams) (*pb.ListResult, error) {
-	result, total, err := t.AccountTransactionController.FindAllByAccountTo(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
-
+func (t *TransactionGrpcHandler) ListByType(ctx context.Context, in *pb.ListByTypeRequest) (*pb.ListResponse, error) {
+	response, total, err := t.TransactionController.ListByType(ctx, in.Type.String(), int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
 	var transactions []*pb.Transaction
 
 	if err != nil {
-		return &pb.ListResult{
-			Total: 0,
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	for _, value := range result {
+	if transactions == nil {
+		return nil, status.Error(codes.NotFound, "no payment was found")
+	}
+
+	for _, value := range response {
 		transactions = append(transactions, &pb.Transaction{
-			ID:        value.ID,
-			Amount:    float32(value.Amount),
-			Status:    value.Status,
-			Currency:  value.Currency,
-			FromID:    value.AccountFromID,
-			ToID:      value.AccountToID,
-			CreatedAt: value.CreatedAt.String(),
-			UpdatedAt: value.UpdatedAt.String(),
+			ID:          value.ID,
+			Amount:      float32(value.Amount),
+			Status:      value.Status,
+			Currency:    value.Currency,
+			AccountFrom: value.AccountFromID,
+			AccountTo:   value.AccountToID,
+			Type:        value.Type,
+			ExternalID:  value.ExternalID,
+			CreatedAt:   value.CreatedAt.String(),
+			UpdatedAt:   value.UpdatedAt.String(),
 		})
 	}
 
-	return &pb.ListResult{
+	return &pb.ListResponse{
 		Transactions: transactions,
 		Total:        int32(total),
 	}, nil
 }
 
-func (t *TransactionGrpcHandler) RegisterAccountPayment(ctx context.Context, in *pb.CreateParams) (*pb.PaymentResult, error) {
-	result, err := t.AccountTransactionController.RegisterAccountTransaction(ctx, in.FromID, in.DestinationID, float64(in.Amount), in.Currency)
+func (t *TransactionGrpcHandler) GetByReference(ctx context.Context, in *pb.GetRequest) (*pb.Response, error) {
+	response, err := t.TransactionController.GetByExternalID(ctx, in.TransactionID, in.Id)
 
 	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.Aborted, err.Error())
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	return &pb.PaymentResult{
+	return &pb.Response{
 		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			ToID:      result.AccountToID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
+			ID:          response.ID,
+			Amount:      float32(response.Amount),
+			Status:      response.Status,
+			Currency:    response.Currency,
+			AccountFrom: response.AccountFromID,
+			AccountTo:   response.AccountToID,
+			Type:        response.Type,
+			ExternalID:  response.ExternalID,
+			CreatedAt:   response.CreatedAt.String(),
+			UpdatedAt:   response.UpdatedAt.String(),
 		},
 	}, nil
 }
 
-func (t *TransactionGrpcHandler) GetByService(ctx context.Context, in *pb.GetByParams) (*pb.PaymentResult, error) {
-	result, err := t.StoreTransactionController.FindOneByStore(ctx, in.Id, in.TransactionID)
-
-	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
-	}
-
-	return &pb.PaymentResult{
-		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			ServiceID: result.ServiceID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
-		},
-	}, nil
-}
-func (t *TransactionGrpcHandler) ListByService(ctx context.Context, in *pb.ListByParams) (*pb.ListResult, error) {
-	result, total, err := t.ServiceTransactionController.FindAllByServiceId(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
-
+func (t *TransactionGrpcHandler) ListByReference(ctx context.Context, in *pb.ListRequest) (*pb.ListResponse, error) {
+	response, total, err := t.TransactionController.ListByExternalID(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
 	var transactions []*pb.Transaction
 
 	if err != nil {
-		return &pb.ListResult{
-			Total: 0,
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	for _, value := range result {
+	if transactions == nil {
+		return nil, status.Error(codes.NotFound, "no payment was found")
+	}
+
+	for _, value := range response {
 		transactions = append(transactions, &pb.Transaction{
-			ID:        value.ID,
-			Amount:    float32(value.Amount),
-			Status:    value.Status,
-			Currency:  value.Currency,
-			FromID:    value.AccountFromID,
-			ServiceID: value.ServiceID,
-			CreatedAt: value.CreatedAt.String(),
-			UpdatedAt: value.UpdatedAt.String(),
+			ID:          value.ID,
+			Amount:      float32(value.Amount),
+			Status:      value.Status,
+			Currency:    value.Currency,
+			AccountFrom: value.AccountFromID,
+			AccountTo:   value.AccountToID,
+			Type:        value.Type,
+			ExternalID:  value.ExternalID,
+			CreatedAt:   value.CreatedAt.String(),
+			UpdatedAt:   value.UpdatedAt.String(),
 		})
 	}
 
-	return &pb.ListResult{
-		Transactions: transactions,
-		Total:        int32(total),
-	}, nil
-
-}
-func (t *TransactionGrpcHandler) RegisterServicePayment(ctx context.Context, in *pb.CreateServiceParams) (*pb.PaymentResult, error) {
-	result, err := t.ServiceTransactionController.RegisterServiceTransaction(ctx, in.FromID, in.ServiceID, in.ServicePriceID, float64(in.Amount), in.Currency)
-
-	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &pb.PaymentResult{
-		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			ServiceID: result.ServiceID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
-		},
-	}, nil
-}
-
-func (t *TransactionGrpcHandler) GetByStore(ctx context.Context, in *pb.GetByParams) (*pb.PaymentResult, error) {
-	result, err := t.StoreTransactionController.FindOneByStore(ctx, in.Id, in.TransactionID)
-
-	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
-	}
-
-	return &pb.PaymentResult{
-		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			StoreID:   result.StoreID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
-		},
-	}, nil
-}
-func (t *TransactionGrpcHandler) ListByStore(ctx context.Context, in *pb.ListByParams) (*pb.ListResult, error) {
-	result, total, err := t.StoreTransactionController.FindAllByStoreId(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
-
-	var transactions []*pb.Transaction
-
-	if err != nil {
-		return &pb.ListResult{
-			Total: 0,
-			Error: err.Error(),
-		}, status.Error(codes.NotFound, err.Error())
-	}
-
-	for _, value := range result {
-		transactions = append(transactions, &pb.Transaction{
-			ID:        value.ID,
-			Amount:    float32(value.Amount),
-			Status:    value.Status,
-			Currency:  value.Currency,
-			FromID:    value.AccountFromID,
-			StoreID:   value.StoreID,
-			CreatedAt: value.CreatedAt.String(),
-			UpdatedAt: value.UpdatedAt.String(),
-		})
-	}
-
-	return &pb.ListResult{
+	return &pb.ListResponse{
 		Transactions: transactions,
 		Total:        int32(total),
 	}, nil
 }
-func (t *TransactionGrpcHandler) RegisterStorePayment(ctx context.Context, in *pb.CreateParams) (*pb.PaymentResult, error) {
-	result, err := t.StoreTransactionController.RegisterStoreTransaction(ctx, in.FromID, in.DestinationID, float64(in.Amount), in.Currency)
+
+func (t *TransactionGrpcHandler) GetByAccountFrom(ctx context.Context, in *pb.GetRequest) (*pb.Response, error) {
+	response, err := t.TransactionController.GetByAccountFrom(ctx, in.TransactionID, in.Id)
 
 	if err != nil {
-		return &pb.PaymentResult{
-			Error: err.Error(),
-		}, status.Error(codes.Aborted, err.Error())
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	return &pb.PaymentResult{
+	return &pb.Response{
 		Transaction: &pb.Transaction{
-			ID:        result.ID,
-			Amount:    float32(result.Amount),
-			Status:    result.Status,
-			Currency:  result.Currency,
-			FromID:    result.AccountFromID,
-			StoreID:   result.StoreID,
-			CreatedAt: result.CreatedAt.String(),
-			UpdatedAt: result.UpdatedAt.String(),
+			ID:          response.ID,
+			Amount:      float32(response.Amount),
+			Status:      response.Status,
+			Currency:    response.Currency,
+			AccountFrom: response.AccountFromID,
+			AccountTo:   response.AccountToID,
+			Type:        response.Type,
+			ExternalID:  response.ExternalID,
+			CreatedAt:   response.CreatedAt.String(),
+			UpdatedAt:   response.UpdatedAt.String(),
 		},
+	}, nil
+}
+
+func (t *TransactionGrpcHandler) ListByAccountFrom(ctx context.Context, in *pb.ListRequest) (*pb.ListResponse, error) {
+	response, total, err := t.TransactionController.ListByAccountFrom(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
+	var transactions []*pb.Transaction
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if transactions == nil {
+		return nil, status.Error(codes.NotFound, "no payment was found")
+	}
+
+	for _, value := range response {
+		transactions = append(transactions, &pb.Transaction{
+			ID:          value.ID,
+			Amount:      float32(value.Amount),
+			Status:      value.Status,
+			Currency:    value.Currency,
+			AccountFrom: value.AccountFromID,
+			AccountTo:   value.AccountToID,
+			Type:        value.Type,
+			ExternalID:  value.ExternalID,
+			CreatedAt:   value.CreatedAt.String(),
+			UpdatedAt:   value.UpdatedAt.String(),
+		})
+	}
+
+	return &pb.ListResponse{
+		Transactions: transactions,
+		Total:        int32(total),
+	}, nil
+}
+
+func (t *TransactionGrpcHandler) GetByAccountTo(ctx context.Context, in *pb.GetRequest) (*pb.Response, error) {
+	response, err := t.TransactionController.GetByAccoutTo(ctx, in.TransactionID, in.Id)
+
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	return &pb.Response{
+		Transaction: &pb.Transaction{
+			ID:          response.ID,
+			Amount:      float32(response.Amount),
+			Status:      response.Status,
+			Currency:    response.Currency,
+			AccountFrom: response.AccountFromID,
+			AccountTo:   response.AccountToID,
+			Type:        response.Type,
+			ExternalID:  response.ExternalID,
+			CreatedAt:   response.CreatedAt.String(),
+			UpdatedAt:   response.UpdatedAt.String(),
+		},
+	}, nil
+}
+
+func (t *TransactionGrpcHandler) ListByAccountTo(ctx context.Context, in *pb.ListRequest) (*pb.ListResponse, error) {
+	response, total, err := t.TransactionController.ListByAccountTo(ctx, in.ID, int(in.Pagination.Page), int(in.Pagination.Limit), in.Pagination.Sort)
+	var transactions []*pb.Transaction
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if transactions == nil {
+		return nil, status.Error(codes.NotFound, "no payment was found")
+	}
+
+	for _, value := range response {
+		transactions = append(transactions, &pb.Transaction{
+			ID:          value.ID,
+			Amount:      float32(value.Amount),
+			Status:      value.Status,
+			Currency:    value.Currency,
+			AccountFrom: value.AccountFromID,
+			AccountTo:   value.AccountToID,
+			Type:        value.Type,
+			ExternalID:  value.ExternalID,
+			CreatedAt:   value.CreatedAt.String(),
+			UpdatedAt:   value.UpdatedAt.String(),
+		})
+	}
+
+	return &pb.ListResponse{
+		Transactions: transactions,
+		Total:        int32(total),
 	}, nil
 }

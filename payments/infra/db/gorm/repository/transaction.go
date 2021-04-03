@@ -1,14 +1,18 @@
 package repository
 
 import (
-	"errors"
-
 	"github.com/EdlanioJ/kbu/payments/domain/entity"
 	"github.com/jinzhu/gorm"
 )
 
 type TransactionRepositoryGORM struct {
 	DB *gorm.DB
+}
+
+func NewTransactionRepository(db *gorm.DB) *TransactionRepositoryGORM {
+	return &TransactionRepositoryGORM{
+		DB: db,
+	}
 }
 
 func (t *TransactionRepositoryGORM) Register(transaction *entity.Transaction) error {
@@ -19,12 +23,6 @@ func (t *TransactionRepositoryGORM) Register(transaction *entity.Transaction) er
 	}
 
 	return nil
-}
-
-func NewTransactionRepository(db *gorm.DB) *TransactionRepositoryGORM {
-	return &TransactionRepositoryGORM{
-		DB: db,
-	}
 }
 
 func (t *TransactionRepositoryGORM) Save(transaction *entity.Transaction) error {
@@ -39,42 +37,6 @@ func (t *TransactionRepositoryGORM) Save(transaction *entity.Transaction) error 
 func (t *TransactionRepositoryGORM) Find(id string) (*entity.Transaction, error) {
 	transaction := &entity.Transaction{}
 	err := t.DB.First(transaction, "id = ?", id).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return transaction, nil
-}
-
-func (t *TransactionRepositoryGORM) FindOneByAccount(transactionId string, accountId string) (*entity.Transaction, error) {
-	transaction := &entity.Transaction{}
-
-	err := t.DB.First(transaction, "id = ? AND account_to_id = ?", transactionId, accountId).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return transaction, nil
-}
-
-func (t *TransactionRepositoryGORM) FindOneByService(transactionId string, serviceId string) (*entity.Transaction, error) {
-	transaction := &entity.Transaction{}
-
-	err := t.DB.First(transaction, "id = ? AND service_id = ?", transactionId, serviceId).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return transaction, nil
-}
-
-func (t *TransactionRepositoryGORM) FindOneByStore(transactionId string, storeId string) (*entity.Transaction, error) {
-	transaction := &entity.Transaction{}
-
-	err := t.DB.First(transaction, "id = ? AND store_id = ?", transactionId, storeId).Error
 
 	if err != nil {
 		return nil, err
@@ -105,7 +67,19 @@ func (t *TransactionRepositoryGORM) FindAll(pagination *entity.Pagination) ([]*e
 	return transactions, totalTransaction, nil
 }
 
-func (t *TransactionRepositoryGORM) FindByAccountFromId(accountId string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
+func (t *TransactionRepositoryGORM) FindByType(transactionID, transactionType string) (*entity.Transaction, error) {
+	transaction := &entity.Transaction{}
+
+	err := t.DB.First(transaction, "id = ? AND type = ?", transactionID, transactionType).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
+}
+
+func (t *TransactionRepositoryGORM) FindAllByType(transactionType string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
 	var transactions []*entity.Transaction
 
 	limit := pagination.Limit
@@ -113,9 +87,8 @@ func (t *TransactionRepositoryGORM) FindByAccountFromId(accountId string, pagina
 	page := pagination.Page
 
 	var totalTransaction int
-
 	err := t.DB.
-		Where("account_from_id = ?", accountId).
+		Where("type = ?", transactionType).
 		Offset((page - 1) * limit).
 		Limit(limit).
 		Order(sort).
@@ -129,7 +102,19 @@ func (t *TransactionRepositoryGORM) FindByAccountFromId(accountId string, pagina
 	return transactions, totalTransaction, nil
 }
 
-func (t *TransactionRepositoryGORM) FindByAccountToId(accountId string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
+func (t *TransactionRepositoryGORM) FindByExternalID(transactionID, externalID string) (*entity.Transaction, error) {
+	transaction := &entity.Transaction{}
+
+	err := t.DB.First(transaction, "id = ? AND external_id = ?", transactionID, externalID).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
+}
+
+func (t *TransactionRepositoryGORM) FindAllByExternalID(externalID string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
 	var transactions []*entity.Transaction
 
 	limit := pagination.Limit
@@ -139,7 +124,7 @@ func (t *TransactionRepositoryGORM) FindByAccountToId(accountId string, paginati
 	var totalTransaction int
 
 	err := t.DB.
-		Where("account_to_id = ?", accountId).
+		Where("external_id = ?", externalID).
 		Offset((page - 1) * limit).
 		Limit(limit).
 		Order(sort).
@@ -153,7 +138,19 @@ func (t *TransactionRepositoryGORM) FindByAccountToId(accountId string, paginati
 	return transactions, totalTransaction, nil
 }
 
-func (t *TransactionRepositoryGORM) FindByServiceId(serviceId string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
+func (t *TransactionRepositoryGORM) FindByFromAccountID(transactionID, accountID string) (*entity.Transaction, error) {
+	transaction := &entity.Transaction{}
+
+	err := t.DB.First(transaction, "id = ? AND account_from_id = ?", transactionID, accountID).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
+}
+
+func (t *TransactionRepositoryGORM) FindAllByFromAccountID(accountID string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
 	var transactions []*entity.Transaction
 
 	limit := pagination.Limit
@@ -163,7 +160,7 @@ func (t *TransactionRepositoryGORM) FindByServiceId(serviceId string, pagination
 	var totalTransaction int
 
 	err := t.DB.
-		Where("service_id = ?", serviceId).
+		Where("account_from_id = ?", accountID).
 		Offset((page - 1) * limit).
 		Limit(limit).
 		Order(sort).
@@ -177,7 +174,18 @@ func (t *TransactionRepositoryGORM) FindByServiceId(serviceId string, pagination
 	return transactions, totalTransaction, nil
 }
 
-func (t *TransactionRepositoryGORM) FindByStoreId(storeId string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
+func (t *TransactionRepositoryGORM) FindByToAccountID(transactionID, accountID string) (*entity.Transaction, error) {
+	transaction := &entity.Transaction{}
+	err := t.DB.First(transaction, "id = ? AND account_to_id = ?", transactionID, accountID).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
+}
+
+func (t *TransactionRepositoryGORM) FindAllByToAccountID(accountID string, pagination *entity.Pagination) ([]*entity.Transaction, int, error) {
 	var transactions []*entity.Transaction
 
 	limit := pagination.Limit
@@ -187,7 +195,7 @@ func (t *TransactionRepositoryGORM) FindByStoreId(storeId string, pagination *en
 	var totalTransaction int
 
 	err := t.DB.
-		Where("store_id = ?", storeId).
+		Where("account_to_id = ?", accountID).
 		Offset((page - 1) * limit).
 		Limit(limit).
 		Order(sort).
@@ -196,7 +204,7 @@ func (t *TransactionRepositoryGORM) FindByStoreId(storeId string, pagination *en
 		Error
 
 	if err != nil {
-		return nil, 0, errors.New(err.Error())
+		return nil, 0, err
 	}
 	return transactions, totalTransaction, nil
 }

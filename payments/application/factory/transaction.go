@@ -8,9 +8,9 @@ import (
 )
 
 func TransactionControllerFactory(database *gorm.DB) *controller.Transaction {
-	repo := repository.NewTransactionRepository(database)
-
-	transactionService := service.NewTransaction(repo)
+	transactionRepo := repository.NewTransactionRepository(database)
+	accountRepo := repository.NewAccountRepository(database)
+	transactionService := service.NewTransaction(transactionRepo, accountRepo)
 
 	return controller.NewTransaction(transactionService)
 }
